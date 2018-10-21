@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.geraudwilling</groupId>
+	<artifactId>WebScraping</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>WebScraping</name>
+	<description>A web scraping project to check available appointments on Toulouse prefecture website</description>
+
+	<properties>
+    	<htmlunit>2.19</htmlunit>
+    	<rxjava>0.19.0</rxjava>
+    </properties>
+
+	<dependencies>
+		<dependency>  
+		    <groupId>net.sourceforge.htmlunit</groupId>
+		    <artifactId>htmlunit</artifactId>
+		    <version>${htmlunit}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.netflix.rxjava/rxjava-core -->
+		<dependency>
+		    <groupId>com.netflix.rxjava</groupId>
+		    <artifactId>rxjava-core</artifactId>
+		    <version>${rxjava}</version>
+		</dependency>
+		
+	</dependencies>
+
+
+</project>
