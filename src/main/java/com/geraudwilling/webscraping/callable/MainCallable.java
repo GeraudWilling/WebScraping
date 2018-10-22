@@ -1,51 +1,75 @@
 package com.geraudwilling.webscraping.callable;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.apache.log4j.Logger;
+
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.geraudwilling.webscraping.bean.ScrapingResult;
+import com.geraudwilling.webscraping.main.WebScrapingMain;
 import com.geraudwilling.webscraping.util.PropertiesKey;
 import com.geraudwilling.webscraping.util.PropertiesReader;
 
-public class MainCallable implements Callable<ScrapingResult>{
+public class MainCallable implements Callable<List<ScrapingResult>>{
 
 	PropertiesReader propertiesReader = PropertiesReader.INSTANCE;
-	
-	public ScrapingResult call() throws Exception {
+	static final Logger logger = Logger.getLogger(MainCallable.class);
+
+	public List<ScrapingResult> call() throws Exception {
 		String url = propertiesReader.getProperties(PropertiesKey.GET_ALL_DESK_URL);
-		WebClient client = new WebClient();  
-		client.getOptions().setCssEnabled(true);  
-		client.getOptions().setJavaScriptEnabled(true);  
-		client.getOptions().setThrowExceptionOnFailingStatusCode(false);
-		client.getOptions().setThrowExceptionOnScriptError(false);
+		List<ScrapingResult> results = new ArrayList<>();
 		
-		//Land on main page for appointments
-		HtmlPage page = client.getPage(url);
-		List<HtmlRadioButtonInput> items = (List<HtmlRadioButtonInput>) page.getByXPath("//input[@type='radio']");
-		
-		//Iterate through all 'guichet', check them and then click on submit 
-		for(HtmlRadioButtonInput item: items){
-			// Check the radio
-			item.setChecked(true);
-			// Get the submit button
-			HtmlElement button = (HtmlElement) page.getFirstByXPath("//input[@type='submit']");
-			//Submit the choice
-			page = button.click();
-			//Check whether a new Rdv exists or not
-			HtmlElement response = (HtmlElement) page
-					.getFirstByXPath(propertiesReader.getProperties(PropertiesKey.TARGET_TEXT));
+		try(WebClient client = new WebClient()) {
+			client.getOptions().setCssEnabled(false);  
+			client.getOptions().setJavaScriptEnabled(false);  
+			client.getOptions().setThrowExceptionOnFailingStatusCode(false);
+			client.getOptions().setThrowExceptionOnScriptError(false);
 			
-			if(response != null){
-				System.out.println("null html elementnot found");
+			logger.info("Starting callable ...");
+			
+			//Land on main page for appointments
+			HtmlPage landingPage = client.getPage(url);
+			List<HtmlRadioButtonInput> items = (List<HtmlRadioButtonInput>) landingPage.getByXPath("//input[@type='radio']");
+			
+			//Iterate through all 'guichet', check them and then click on submit 
+			for(int i=1; i<= items.size(); i++){
+				logger.debug("Before checking input ...");
+				// Check the radio
+				items.get(i-1).setChecked(true);
+				// Get the submit button
+				HtmlElement button = landingPage.getFirstByXPath("//input[@type='submit']");
+				logger.debug("Before clicking on submit ...");
+				//Submit the choice
+				HtmlPage rdvExistPage = button.click();
+				//Check whether a new Rdv exists or not
+				String targetText= propertiesReader.getProperties(PropertiesKey.TARGET_TEXT);
+				HtmlForm response = rdvExistPage
+						.getFirstByXPath("//*[contains(text(),'" +targetText +"')]");
+				
+				if(response != null && response.isDisplayed() && response.asText().contains(targetText)){
+					//If page contains previous text, then a rdv doesn't exist for this Guichet
+					logger.info("Rendez-vous not found for Guichet "+ i + " on date : "+LocalDateTime.now() 
+					+ " page content: " + response.asText());
+					results.add(new ScrapingResult(false,i, LocalDateTime.now(),response.asXml()));
+
+				}else {
+					logger.info("!!!****Rendez-vous found for Guichet "+ i + " on date : "+LocalDateTime.now()
+					+ " page content: " + response != null? response.asXml() : "null");
+					results.add(new ScrapingResult(true,i, LocalDateTime.now(),response.asXml()));
+				}
 			}
 		}
-		System.out.println(items.size());
-
-		return null;
+		//Close the stream
+		PropertiesReader.INSTANCE.closeInput();
+		return results;
 	}
 
 }
