@@ -70,7 +70,7 @@ public class WebScrapingMain {
 	        results.forEach((List<ScrapingResult> result) -> {
 	        	int guichetNumber = AppHelper.isRdvAvailable(result);
 	        	if(guichetNumber != 0) {
-	        		logger.info("Ending application... At least one Rdv found for Guichet n°" + guichetNumber );
+	        		logger.info("Ending application... At least one Rdv found for Guichet numero" + guichetNumber );
 	        		try {
 						AppHelper.sendMail(result);
 					} catch (MessagingException | ConfigurationException | IOException e) {
