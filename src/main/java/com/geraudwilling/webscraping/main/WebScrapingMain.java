@@ -57,7 +57,7 @@ public class WebScrapingMain {
 	            	List<ScrapingResult> result = mainCallable.call();
 	                results.onNext(result);
 	            } catch (Exception e) {
-	    			logger.error("Fatal error occurs withing the callable thred, stopping the thread...",e);
+	    			logger.error("Fatal error occurs withing the callable thread, stopping the thread...",e);
 	            }
 	        };
 	        // Periodically run the Runnable
@@ -73,14 +73,14 @@ public class WebScrapingMain {
 	        		logger.info("Ending application... At least one Rdv found for Guichet n°" + guichetNumber );
 	        		try {
 						AppHelper.sendMail(result);
-					} catch (IOException | MessagingException | ConfigurationException e) {
+					} catch (MessagingException | ConfigurationException | IOException e) {
 						logger.error("Fatal error occurs when sending mail",e);
 					}
 	        	}else {
 	        		logger.info("Ending application... No rdv found ");
 	        		try {
 						AppHelper.sendMail(result);
-					} catch (IOException | MessagingException | ConfigurationException e) {
+					} catch (MessagingException | ConfigurationException | IOException e) {
 						logger.error("Fatal error occurs when sending mail",e);
 					}
 	        	}

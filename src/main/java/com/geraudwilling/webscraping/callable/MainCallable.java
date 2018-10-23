@@ -1,6 +1,5 @@
 package com.geraudwilling.webscraping.callable;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +7,14 @@ import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.geraudwilling.webscraping.bean.ScrapingResult;
-import com.geraudwilling.webscraping.main.WebScrapingMain;
 import com.geraudwilling.webscraping.util.PropertiesKey;
 import com.geraudwilling.webscraping.util.PropertiesReader;
 
@@ -23,15 +23,18 @@ public class MainCallable implements Callable<List<ScrapingResult>>{
 	PropertiesReader propertiesReader = PropertiesReader.INSTANCE;
 	static final Logger logger = Logger.getLogger(MainCallable.class);
 
+
 	public List<ScrapingResult> call() throws Exception {
 		String url = propertiesReader.getProperties(PropertiesKey.GET_ALL_DESK_URL);
 		List<ScrapingResult> results = new ArrayList<>();
 		
-		try(WebClient client = new WebClient()) {
+		try(WebClient client = new WebClient(BrowserVersion.FIREFOX_38)) {
+			client.setAjaxController(new NicelyResynchronizingAjaxController()); 
 			client.getOptions().setCssEnabled(false);  
-			client.getOptions().setJavaScriptEnabled(false);  
+			client.getOptions().setJavaScriptEnabled(true);  
 			client.getOptions().setThrowExceptionOnFailingStatusCode(false);
 			client.getOptions().setThrowExceptionOnScriptError(false);
+			
 			
 			logger.info("Starting callable ...");
 			
@@ -49,6 +52,8 @@ public class MainCallable implements Callable<List<ScrapingResult>>{
 				logger.debug("Before clicking on submit ...");
 				//Submit the choice
 				HtmlPage rdvExistPage = button.click();
+				//Wait for js to complete for 5 seconds max
+				client.waitForBackgroundJavaScript(5000L);
 				//Check whether a new Rdv exists or not
 				String targetText= propertiesReader.getProperties(PropertiesKey.TARGET_TEXT);
 				HtmlForm response = rdvExistPage
@@ -61,9 +66,8 @@ public class MainCallable implements Callable<List<ScrapingResult>>{
 					results.add(new ScrapingResult(false,i, LocalDateTime.now(),response.asXml()));
 
 				}else {
-					logger.info("!!!****Rendez-vous found for Guichet "+ i + " on date : "+LocalDateTime.now()
-					+ " page content: " + response != null? response.asXml() : "null");
-					results.add(new ScrapingResult(true,i, LocalDateTime.now(),response.asXml()));
+					logger.info("!!!****Rendez-vous found for Guichet "+ i + " on date : "+LocalDateTime.now());
+					results.add(new ScrapingResult(true,i, LocalDateTime.now(),""));
 				}
 			}
 		}

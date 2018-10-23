@@ -14,12 +14,18 @@ public enum PropertiesReader {
 	
 	INSTANCE;
 	
-	Properties  prop = null;
-	InputStream input = null;
+	private Properties  prop = null;
+	private InputStream input = null;
+	private	StandardPBEStringEncryptor encryptor = null;
+	
 	final String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
 	final String appConfigPath = rootPath + "app.properties";
 	private String salt;
 	
+	
+	/*
+	 * Private constructor
+	 */
 	private PropertiesReader() {}
 
  
@@ -49,10 +55,13 @@ public enum PropertiesReader {
      */
     public  String decryptPropertyValue(String propertyKey) throws  org.apache.commons.configuration.ConfigurationException, IOException {
        String encryptedPropertyValue = getProperties(propertyKey);
-       StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
-	   encryptor.setPassword(PropertiesReader.INSTANCE.getSalt());
+	   if (encryptor == null) {
+		encryptor = new StandardPBEStringEncryptor();
+		encryptor.setPassword(PropertiesReader.INSTANCE.getSalt());
+	   }
+
        String decryptedPropertyValue = encryptor.decrypt(encryptedPropertyValue);
-       return decryptedPropertyValue;
+       return decryptedPropertyValue.trim();
    }
     
     public String getSalt() {
