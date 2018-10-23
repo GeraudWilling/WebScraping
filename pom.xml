@@ -35,10 +35,22 @@
 			<version>${log4j.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.mail/mail -->
+<!-- 		<dependency> -->
+<!-- 		    <groupId>javax.mail</groupId> -->
+<!-- 		    <artifactId>mail</artifactId> -->
+<!-- 		    <version>${javax.mail.version}</version> -->
+<!-- 		</dependency> -->
+		
 		<dependency>
-		    <groupId>javax.mail</groupId>
-		    <artifactId>mail</artifactId>
-		    <version>${javax.mail.version}</version>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		 
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.5.5</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.jasypt/jasypt -->
 		 <dependency>
@@ -93,7 +105,47 @@
     	</plugins>
     </build>
 		
-		
+	<profiles> 
+		<profile>
+		  <!-- When built in OpenShift the 'openshift' profile will be used when invoking mvn. -->
+		  <!-- Use this profile for any OpenShift specific customization your app will need. -->
+		  <!-- By default that is to put the resulting archive into the 'deployments' folder. -->
+		  <!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
+		  <id>openshift</id>
+		    <build>
+		      <finalName>ConnectedBlanket</finalName>
+		      <plugins>
+		        <plugin>
+			        <groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-compiler-plugin</artifactId>
+			        <version>2.5.1</version>
+			        <configuration>
+			          <source>${java.version}</source>
+			          <target>${java.version}</target>
+			          <compilerArgument>-Xlint:all</compilerArgument>
+			          <showWarnings>true</showWarnings>
+			          <showDeprecation>true</showDeprecation>
+			        </configuration>
+		      </plugin>
+      
+		      <plugin>
+			      <artifactId>maven-assembly-plugin</artifactId>
+			      <configuration>
+			        <archive>
+			          <manifest>
+			            <mainClass>com.geraudwilling.webscraping.main.WebScrapingMain</mainClass>
+			          </manifest>
+			        </archive>
+			        <descriptorRefs>
+			          <descriptorRef>jar-with-dependencies</descriptorRef>
+			        </descriptorRefs>
+			      </configuration>
+		    </plugin>
+		        
+		      </plugins>
+		    </build>
+		</profile>
+	</profiles>
 		
 	
 	
