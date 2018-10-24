@@ -71,6 +71,9 @@ public class WebScrapingMain {
 	        	int guichetNumber = AppHelper.isRdvAvailable(result);
 	        	if(guichetNumber != 0) {
 	        		logger.info("Ending application... At least one Rdv found for Guichet numero" + guichetNumber );
+	        		for(ScrapingResult res: result) {
+	        			logger.info("***Date: " + res.getDate()+" Guichet num:"+ res.getNumber() + " " + res.getContent()+ "***");
+	        		}
 	        		try {
 						AppHelper.sendMail(result);
 					} catch (MessagingException | ConfigurationException | IOException e) {
@@ -78,11 +81,6 @@ public class WebScrapingMain {
 					}
 	        	}else {
 	        		logger.info("Ending application... No rdv found ");
-	        		try {
-						AppHelper.sendMail(result);
-					} catch (MessagingException | ConfigurationException | IOException e) {
-						logger.error("Fatal error occurs when sending mail",e);
-					}
 	        	}
 	        });
 		} catch (NumberFormatException | IOException e) {

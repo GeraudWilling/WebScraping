@@ -138,17 +138,11 @@
 		          <execution>
 		            <phase>package</phase>
 		            <configuration>
-		              <target>
-		                      <copy 
+		              <target	name="Copy app.properties file outside the jar">
+	                      <copy 
 		                      file="${project.basedir}/src/main/resources/app.properties" 
-		                      tofile="${project.build.directory}/app.properties" overwrite="true" />
-		
-		                <!--
-		                  Place any Ant task here. You can add anything
-		                  you can add between <target> and </target> in a
-		                  build.xml.
-		                -->
-		
+		                      tofile="${project.build.directory}/app.properties" overwrite="true" 
+		                   />
 		              </target>
 		            </configuration>
 		            <goals>

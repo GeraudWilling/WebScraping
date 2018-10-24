@@ -31,7 +31,7 @@ public class MainCallable implements Callable<List<ScrapingResult>>{
 		try(WebClient client = new WebClient(BrowserVersion.FIREFOX_38)) {
 			client.setAjaxController(new NicelyResynchronizingAjaxController()); 
 			client.getOptions().setCssEnabled(false);  
-			client.getOptions().setJavaScriptEnabled(true);  
+			client.getOptions().setJavaScriptEnabled(false);  
 			client.getOptions().setThrowExceptionOnFailingStatusCode(false);
 			client.getOptions().setThrowExceptionOnScriptError(false);
 			
