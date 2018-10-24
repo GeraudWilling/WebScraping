@@ -93,6 +93,9 @@
 	    	<plugin>
 		      <artifactId>maven-assembly-plugin</artifactId>
 		      <configuration>
+		      	<!-- <target name="copy app.properties files outside the jar">
+                      <copy file="${resources.dir}/src/main/resources/app.properties" tofile="${temp.dir.meta-inf}/target/app.properties" overwrite="true" />
+                </target> -->
 		        <archive>
 		          <manifest>
 		            <mainClass>com.geraudwilling.webscraping.main.WebScrapingMain</mainClass>
@@ -112,6 +115,31 @@
 			    </execution>
 			  </executions>
 	    	</plugin>
+	    	
+	    	<plugin>
+		        <artifactId>maven-antrun-plugin</artifactId>
+		        <version>1.8</version>
+		        <executions>
+		          <execution>
+		            <phase>deploy</phase>
+		            <configuration>
+		              <target>
+		                      <copy file="${resources.dir}/src/main/resources/app.properties" tofile="./target/app.properties" overwrite="true" />
+		
+		                <!--
+		                  Place any Ant task here. You can add anything
+		                  you can add between <target> and </target> in a
+		                  build.xml.
+		                -->
+		
+		              </target>
+		            </configuration>
+		            <goals>
+		              <goal>run</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		      </plugin>
     	</plugins>
     </build>
 		
@@ -124,7 +152,7 @@
 		  <id>openshift</id>
 		    <build>
 		      <finalName>WebScrapingMain</finalName>
-		      <resources>
+		      <!-- <resources>
 				<resource>
 					<directory>${basedir}/src/main/resources</directory>
 					<includes>
@@ -133,7 +161,7 @@
 		            <targetPath>${basedir}/target</targetPath>
 		            <filtering>false</filtering>
 				</resource>
-			  </resources>
+			  </resources> -->
 		    </build>
 		</profile>
 	</profiles>
