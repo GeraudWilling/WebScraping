@@ -116,15 +116,18 @@
 			  </executions>
 	    	</plugin>
 	    	
+	    	<!--  Run ant plugin to copy app properties outside the jar -->
 	    	<plugin>
 		        <artifactId>maven-antrun-plugin</artifactId>
 		        <version>1.8</version>
 		        <executions>
 		          <execution>
-		            <phase>deploy</phase>
+		            <phase>install</phase>
 		            <configuration>
 		              <target>
-		                      <copy file="${resources.dir}/src/main/resources/app.properties" tofile="./target/app.properties" overwrite="true" />
+		                      <copy 
+		                      file="${project.basedir}/src/main/resources/app.properties" 
+		                      tofile="${project.build.directory}/app.properties" overwrite="true" />
 		
 		                <!--
 		                  Place any Ant task here. You can add anything
