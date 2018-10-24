@@ -108,15 +108,6 @@
 			      <goals>
 			        <goal>single</goal>
 			      </goals>
-			      <configuration>
-		              <outputDirectory>${basedir}/target/extra-resources</outputDirectory>
-		              <resources>          
-		                <resource>
-		                  <directory>src/non-packaged-resources</directory>
-		                  <filtering>true</filtering>
-		                </resource>
-		              </resources>              
-		           </configuration>
 			    </execution>
 			  </executions>
 	    	</plugin>
