@@ -72,7 +72,8 @@ public class WebScrapingMain {
 	        	if(guichetNumber != 0) {
 	        		logger.info("Ending application... At least one Rdv found for Guichet numero" + guichetNumber );
 	        		for(ScrapingResult res: result) {
-	        			logger.info("***Date: " + res.getDate()+" Guichet num:"+ res.getNumber() + " " + res.getContent()+ "***");
+	        			logger.info("***Date: " + res.getDate()+" Guichet num:"+ res.getNumber() 
+	        			+ " " + res.getContent()+ "***");
 	        		}
 	        		try {
 						AppHelper.sendMail(result);

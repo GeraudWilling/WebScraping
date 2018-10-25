@@ -10,12 +10,11 @@ import org.apache.log4j.Logger;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.geraudwilling.webscraping.bean.ScrapingResult;
-import com.geraudwilling.webscraping.util.PropertiesKey;
+import com.geraudwilling.webscraping.pages.ChoicePage;
+import com.geraudwilling.webscraping.pages.ResultPage;
 import com.geraudwilling.webscraping.util.PropertiesReader;
 
 public class MainCallable implements Callable<List<ScrapingResult>>{
@@ -25,49 +24,40 @@ public class MainCallable implements Callable<List<ScrapingResult>>{
 
 
 	public List<ScrapingResult> call() throws Exception {
-		String url = propertiesReader.getProperties(PropertiesKey.GET_ALL_DESK_URL);
 		List<ScrapingResult> results = new ArrayList<>();
-		
-		try(WebClient client = new WebClient(BrowserVersion.FIREFOX_38)) {
+		logger.info("Starting callable ...");
+		try(WebClient client = new WebClient(BrowserVersion.CHROME)) {
 			client.setAjaxController(new NicelyResynchronizingAjaxController()); 
 			client.getOptions().setCssEnabled(false);  
 			client.getOptions().setJavaScriptEnabled(false);  
 			client.getOptions().setThrowExceptionOnFailingStatusCode(false);
 			client.getOptions().setThrowExceptionOnScriptError(false);
-			
-			
-			logger.info("Starting callable ...");
-			
+					
 			//Land on main page for appointments
-			HtmlPage landingPage = client.getPage(url);
-			List<HtmlRadioButtonInput> items = (List<HtmlRadioButtonInput>) landingPage.getByXPath("//input[@type='radio']");
+			ChoicePage choicePage = new ChoicePage(client);
+			List<HtmlRadioButtonInput> items = choicePage.getRadioButtonList();
 			
 			//Iterate through all 'guichet', check them and then click on submit 
 			for(int i=1; i<= items.size(); i++){
 				logger.debug("Before checking input ...");
 				// Check the radio
-				items.get(i-1).setChecked(true);
-				// Get the submit button
-				HtmlElement button = landingPage.getFirstByXPath("//input[@type='submit']");
+				choicePage.checkButton(i-1);
 				logger.debug("Before clicking on submit ...");
 				//Submit the choice
-				HtmlPage rdvExistPage = button.click();
-				//Wait for js to complete for 5 seconds max
-				client.waitForBackgroundJavaScript(5000L);
+				HtmlPage rdvExistPage = choicePage.submitPage(true);
 				//Check whether a new Rdv exists or not
-				String targetText= propertiesReader.getProperties(PropertiesKey.TARGET_TEXT);
-				HtmlForm response = rdvExistPage
-						.getFirstByXPath("//*[contains(text(),'" +targetText +"')]");
-				
-				if(response != null && response.isDisplayed() && response.asText().contains(targetText)){
+				ResultPage resultPage=(new ResultPage(rdvExistPage));	
+				//Wait for page loading
+				resultPage.waitForPageLoadingComplete();
+				//Chek results
+				if(!resultPage.rdvExist()){
 					//If page contains previous text, then a rdv doesn't exist for this Guichet
 					logger.info("Rendez-vous not found for Guichet "+ i + " on date : "+LocalDateTime.now() 
-					+ " page content: " + response.asText());
-					results.add(new ScrapingResult(false,i, LocalDateTime.now(),response.asXml()));
-
+					+ " page content: " + resultPage.getResultFormContentAsText());
+					results.add(new ScrapingResult(false,i, LocalDateTime.now(),resultPage.getResultFormContentAsXml()));
 				}else {
 					logger.info("!!!****Rendez-vous found for Guichet "+ i + " on date : "+LocalDateTime.now());
-					results.add(new ScrapingResult(true,i, LocalDateTime.now(),""));
+					results.add(new ScrapingResult(true,i, LocalDateTime.now(),resultPage.getResultFormContentAsXml()));
 				}
 			}
 		}
