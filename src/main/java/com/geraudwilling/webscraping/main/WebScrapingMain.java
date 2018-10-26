@@ -68,9 +68,9 @@ public class WebScrapingMain {
 					TimeUnit.MINUTES);
 			// Handling the results as they arrive
 	        results.forEach((List<ScrapingResult> result) -> {
-	        	int guichetNumber = AppHelper.isRdvAvailable(result);
-	        	if(guichetNumber != 0) {
-	        		logger.info("Ending application... At least one Rdv found for Guichet numero" + guichetNumber );
+	        	//int guichetNumber = AppHelper.isRdvAvailable(result);
+	        	if(!result.isEmpty()) {
+	        		logger.info("Ending application... At least one Rdv found"  );
 	        		for(ScrapingResult res: result) {
 	        			logger.info("***Date: " + res.getDate()+" Guichet num:"+ res.getNumber() 
 	        			+ " " + res.getContent()+ "***");

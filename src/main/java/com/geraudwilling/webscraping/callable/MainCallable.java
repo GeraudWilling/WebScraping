@@ -49,12 +49,12 @@ public class MainCallable implements Callable<List<ScrapingResult>>{
 				ResultPage resultPage=(new ResultPage(rdvExistPage));	
 				//Wait for page loading
 				resultPage.waitForPageLoadingComplete();
-				//Chek results
+				//Check results
 				if(!resultPage.rdvExist()){
 					//If page contains previous text, then a rdv doesn't exist for this Guichet
 					logger.info("Rendez-vous not found for Guichet "+ i + " on date : "+LocalDateTime.now() 
 					+ " page content: " + resultPage.getResultFormContentAsText());
-					results.add(new ScrapingResult(false,i, LocalDateTime.now(),resultPage.getResultFormContentAsXml()));
+					//results.add(new ScrapingResult(false,i, LocalDateTime.now(),resultPage.getResultFormContentAsXml()));
 				}else {
 					logger.info("!!!****Rendez-vous found for Guichet "+ i + " on date : "+LocalDateTime.now());
 					results.add(new ScrapingResult(true,i, LocalDateTime.now(),resultPage.getResultFormContentAsXml()));

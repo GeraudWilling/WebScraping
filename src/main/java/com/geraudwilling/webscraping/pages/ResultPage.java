@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.geraudwilling.webscraping.util.PropertiesKey;
 import com.geraudwilling.webscraping.util.PropertiesReader;
 
@@ -15,7 +17,7 @@ public class ResultPage {
 	private PropertiesReader propertiesReader = PropertiesReader.INSTANCE;
 	private HtmlPage page;
 	private String targetText;
-	private HtmlForm resultForm;
+	private DomNode resultForm;
 	static final Logger logger = Logger.getLogger(ResultPage.class);
 
 
@@ -55,10 +57,11 @@ public class ResultPage {
 			this.resultForm = (HtmlForm) elementKO;
 			if(elementKO != null && elementKO.isDisplayed()){
 				return false;
-			}else if(elementOK != null && elementOK.isDisplayed()){
-				//If target.ok text found, then rdv doesn't exists.
-				return true;
 			}
+		}else if(elementOK instanceof HtmlSubmitInput && elementOK != null && elementOK.isDisplayed()){
+			//If target.ok text found, then rdv doesn't exists.
+			this.resultForm = (HtmlSubmitInput) elementOK;
+			return true;
 		}
 		// if no target text not found, then return false.
 		return false;
