@@ -19,7 +19,7 @@ public class ResultPage {
 	private String targetText;
 	private DomNode resultForm;
 	static final Logger logger = Logger.getLogger(ResultPage.class);
-
+	static final String FORM_BOOKING = "//form[@id='FormBookingCreate']";
 
 	/**Constructor
 	 * @param page the page to search for rdv.
@@ -54,13 +54,13 @@ public class ResultPage {
 		HtmlElement elementOK  = this.page.getFirstByXPath(getTargetTextOk());
 		if(elementKO instanceof HtmlForm){
 			//If target.ko text found, then rdv doesn't exists.
-			this.resultForm = (HtmlForm) elementKO;
+			this.resultForm = this.page.getFirstByXPath(FORM_BOOKING) ;;
 			if(elementKO != null && elementKO.isDisplayed()){
 				return false;
 			}
 		}else if(elementOK instanceof HtmlSubmitInput && elementOK != null && elementOK.isDisplayed()){
 			//If target.ok text found, then rdv doesn't exists.
-			this.resultForm = (HtmlSubmitInput) elementOK;
+			this.resultForm = this.page.getFirstByXPath(FORM_BOOKING) ;
 			return true;
 		}
 		// if no target text not found, then return false.
@@ -72,7 +72,7 @@ public class ResultPage {
 	 * @throws InterruptedException if page.wait() fails.
 	 */
 	public void waitForPageLoadingComplete() throws InterruptedException{
-		HtmlElement element = this.page.getFirstByXPath("//form[@id='FormBookingCreate']") ;
+		HtmlElement element = this.page.getFirstByXPath(FORM_BOOKING) ;
 		boolean aCondition = element instanceof HtmlForm && element != null;
 		int tries = 5;  // Amount of tries to avoid infinite loop
 		while (tries > 0 && aCondition) {

@@ -59,7 +59,6 @@ public enum PropertiesReader {
 		encryptor = new StandardPBEStringEncryptor();
 		encryptor.setPassword(PropertiesReader.INSTANCE.getSalt());
 	   }
-
        String decryptedPropertyValue = encryptor.decrypt(encryptedPropertyValue);
        return decryptedPropertyValue.trim();
    }

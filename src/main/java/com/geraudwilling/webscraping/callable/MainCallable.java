@@ -56,7 +56,8 @@ public class MainCallable implements Callable<List<ScrapingResult>>{
 					+ " page content: " + resultPage.getResultFormContentAsText());
 					//results.add(new ScrapingResult(false,i, LocalDateTime.now(),resultPage.getResultFormContentAsXml()));
 				}else {
-					logger.info("!!!****Rendez-vous found for Guichet "+ i + " on date : "+LocalDateTime.now());
+					logger.info("!!!****Rendez-vous found for Guichet "+ i + " on date : "+LocalDateTime.now()
+					+ " page content: " + resultPage.getResultFormContentAsText());
 					results.add(new ScrapingResult(true,i, LocalDateTime.now(),resultPage.getResultFormContentAsXml()));
 				}
 			}
