@@ -67,7 +67,7 @@ public class AppHelper {
 		StringBuilder body = new StringBuilder("Dear,<br/><br/> A rendez-vous has been found for <br/>");
 		for(int i=0; i< input.size(); i++ ) {
 			if (input.get(i).isRdvAvailable()) {
-				body.append("Guichet numero <b>").append(i + 1).append("<b> <br/>");
+				body.append("Guichet numero <b>").append(i + 1).append("</b> <br/>");
 			}
 		}
 		body.append("<br/>Regards,<br/>Admin.");
